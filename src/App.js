@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import firebase from './utils/firebaseConfig';
 import Main from './components/Main';
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import { UidContext } from "./components/UidContext";
+
 
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [uid, setUid] = useState(null)
 
   const uiConfig = {
     signInFlow: "popup",
@@ -21,24 +24,27 @@ const App = () => {
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => {
       setIsSignedIn(!!user);
-      console.log(user);
+      setUid(user.uid)
+      // console.log(user);
     });
   }, []);
 
   return (
-    <div className="app" style={{textAlign: 'center'}}>
-      {isSignedIn ? (
-        <Main />
-      ) : (
-        <div className="login-page">
-          <h1>React Crud</h1>
-          <StyledFirebaseAuth 
-            uiConfig={uiConfig}
-            firebaseAuth={firebase.auth()}
-          />
+    <UidContext.Provider value={uid}>
+        <div className="app" style={{textAlign: 'center'}}>
+          {isSignedIn ? (
+            <Main />
+          ) : (
+            <div className="login-page">
+              <h1>React Crud Firebase</h1>
+              <StyledFirebaseAuth 
+                uiConfig={uiConfig}
+                firebaseAuth={firebase.auth()}
+              />
+            </div>
+          )}
         </div>
-      )}
-    </div>
+    </UidContext.Provider>
   );
 };
 
